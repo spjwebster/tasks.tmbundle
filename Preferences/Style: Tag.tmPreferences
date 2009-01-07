@@ -3,17 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>name</key>
-	<string>Style: Header</string>
+	<string>Style: Tag</string>
 	<key>scope</key>
-	<string>meta.header.tasks</string>
+	<string>meta.tag.tasks</string>
 	<key>settings</key>
 	<dict>
-		<key>background</key>
-		<string>#3467D1</string>
 		<key>foreground</key>
-		<string>#FFFFFF</string>
+		<string>#FF99FF</string>
 	</dict>
 	<key>uuid</key>
-	<string>DD46B6D4-3616-4797-87D4-F089F68B28A7</string>
+	<string>01FEA49E-FE1F-4097-B3F8-D3056855221F</string>
 </dict>
 </plist>

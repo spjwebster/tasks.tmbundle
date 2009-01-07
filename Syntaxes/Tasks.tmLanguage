@@ -10,6 +10,10 @@
 		<string>tasks</string>
 		<string>todolist</string>
 	</array>
+	<key>foldingStartMarker</key>
+	<string>^(\s*)((.+)(:)\s*$\n?)</string>
+	<key>foldingStopMarker</key>
+	<string>^\s*$</string>
 	<key>keyEquivalent</key>
 	<string>^~T</string>
 	<key>name</key>
@@ -46,6 +50,10 @@
 			<array>
 				<dict>
 					<key>include</key>
+					<string>#tag</string>
+				</dict>
+				<dict>
+					<key>include</key>
 					<string>#link</string>
 				</dict>
 			</array>
@@ -74,6 +82,10 @@
 			<string>markup.list.pending.tasks</string>
 			<key>patterns</key>
 			<array>
+				<dict>
+					<key>include</key>
+					<string>#tag</string>
+				</dict>
 				<dict>
 					<key>include</key>
 					<string>#link</string>
@@ -109,6 +121,12 @@
 			<key>name</key>
 			<string>meta.header-line.tasks</string>
 		</dict>
+		<dict>
+			<key>match</key>
+			<string>^\s*([^✓-].*[^:]\s*)$</string>
+			<key>name</key>
+			<string>meta.paragraph.note.tasks</string>
+		</dict>
 	</array>
 	<key>repository</key>
 	<dict>
@@ -118,6 +136,13 @@
 			<string>(https?|ftp|mailto):\S+?(?=[)&gt;,.':;"]*(\s|$)|$)</string>
 			<key>name</key>
 			<string>markup.underline.link.tasks</string>
+		</dict>
+		<key>tag</key>
+		<dict>
+			<key>match</key>
+			<string>(@\S+)</string>
+			<key>name</key>
+			<string>meta.tag.tasks</string>
 		</dict>
 	</dict>
 	<key>scopeName</key>
