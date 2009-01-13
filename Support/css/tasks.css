@@ -1,0 +1,34 @@
+html, body {
+    background: #1a1a1a;
+    color: #ffffff;
+    font: 12px "Lucida Grande";
+}
+
+h2 {
+    font-size: 14px;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+h2 a {
+    color: #ccff66;
+    text-decoration: none;
+}
+
+li a {
+    color: inherit;
+}
+
+li.complete {
+    color: #7e7e7e;    
+}
+
+.tag {
+    color: #7e7e7e;
+}

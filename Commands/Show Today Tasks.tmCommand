@@ -21,8 +21,9 @@ projects = []
 lines = sys.stdin.readlines()
 
 current_project = None
-line_num = 1
+line_num = 0
 for line in lines:
+	line_num += 1
 	m = project_re.match( line )
 	if m:
 		current_project = { 
@@ -41,11 +42,10 @@ for line in lines:
 			'line': line_num,
 			'complete': task_complete
 		} )
-	line_num += 1
 
 
 
-print '&lt;html&gt;&lt;head&gt;&lt;title&gt;Tasks: Today&lt;/title&gt;&lt;style type="text/css"&gt;li.complete a { text-decoration: line-through; color: #999; }&lt;/style&gt;&lt;/head&gt;&lt;body&gt;'
+print '&lt;html&gt;&lt;head&gt;&lt;title&gt;Tasks: Today&lt;/title&gt;&lt;link rel="stylesheet" type="text/css" href="file://%s/css/tasks.css"/&gt;&lt;/head&gt;&lt;body&gt;' % os.environ[ 'TM_BUNDLE_SUPPORT' ]
 for project in projects:
 	if len( project[ 'tasks' ] ):
 		print ( '&lt;h2&gt;&lt;a href="txmt://open/?url=file://%s&amp;line=%s"&gt;%s&lt;/a&gt;&lt;/h2&gt;' % ( file, str( project[ 'line' ] ), project[ 'title' ] ) )
