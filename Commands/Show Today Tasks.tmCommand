@@ -14,30 +14,47 @@ import os, sys, re
 
 file = os.environ[ 'TM_FILEPATH' ]
 project_re = re.compile( '^(\s*)(?P&lt;title&gt;.+):\s*$' )
-task_re = re.compile( '^\s*(-|✓)(?P&lt;title&gt;.+?)(?P&lt;tags&gt;((@\S*)(\s*))*)$' )
+task_re = re.compile( '^\s*(?P&lt;symbol&gt;-|✓)(?P&lt;title&gt;.+?)(?P&lt;tags&gt;((@\S*)(\s*))*)$' )
+
+projects = []
 
 lines = sys.stdin.readlines()
 
-print '&lt;html&gt;&lt;head&gt;&lt;title&gt;Tasks: Today&lt;/title&gt;&lt;style type="text/css"&gt;li.completed a { text-decoration: line-through; color: #999; }&lt;/style&gt;&lt;/head&gt;&lt;body&gt;'
-
-current_project = ''
-first_task = True
-first_project = True
+current_project = None
 line_num = 1
 for line in lines:
 	m = project_re.match( line )
 	if m:
-		current_project = m.group( 'title' )	
-		first_task = True
+		current_project = { 
+			'title': m.group( 'title' ),
+			'line': line_num,
+			'tasks': []
+		}
+		projects.append( current_project )
 		continue
+
 	m = task_re.match( line )
 	if m and m.group('tags') and m.group('tags').find( '@today' ) != -1:
-		if first_task:
-			print( '&lt;/ul&gt;&lt;h2&gt;%s&lt;/h2&gt;&lt;ul&gt;' % current_project )
-			first_task = False
-		task_class = 'completed' if m.group( 1 ) == '✓' else 'pending'
-		print( '&lt;li class="%s"&gt;&lt;a href="txmt://open/?url=file://%s&amp;line=%s"&gt;%s&lt;/a&gt;&lt;/li&gt;' % ( task_class, file, str( line_num ), m.group('title') ) )
+		task_complete = m.group( 'symbol' ) == '✓'
+		current_project['tasks'].append( {
+			'title': m.group( 'title' ),
+			'line': line_num,
+			'complete': task_complete
+		} )
 	line_num += 1
+
+
+
+print '&lt;html&gt;&lt;head&gt;&lt;title&gt;Tasks: Today&lt;/title&gt;&lt;style type="text/css"&gt;li.complete a { text-decoration: line-through; color: #999; }&lt;/style&gt;&lt;/head&gt;&lt;body&gt;'
+for project in projects:
+	if len( project[ 'tasks' ] ):
+		print ( '&lt;h2&gt;&lt;a href="txmt://open/?url=file://%s&amp;line=%s"&gt;%s&lt;/a&gt;&lt;/h2&gt;' % ( file, str( project[ 'line' ] ), project[ 'title' ] ) )
+		print ( '&lt;ul&gt;' )
+
+		for task in project[ 'tasks' ]:
+			task_class = 'complete' if task[ 'complete' ] else 'pending'
+			print( '&lt;li class="%s"&gt;&lt;a href="txmt://open/?url=file://%s&amp;line=%s"&gt;%s&lt;/a&gt;&lt;/li&gt;' % ( task_class, file, str( task[ 'line' ] ), task[ 'title' ] ) )
+		print ( '&lt;/ul&gt;' )
 
 print '&lt;/body&gt;&lt;/html&gt;'</string>
 	<key>input</key>
