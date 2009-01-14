@@ -4,31 +4,43 @@ html, body {
     font: 12px "Lucida Grande";
 }
 
-h2 {
-    font-size: 14px;
-}
 
 a {
     text-decoration: none;
+    color: inherit;
 }
 
 a:hover {
     text-decoration: underline;
 }
 
-h2 a {
+
+h2 {
+    font-size: 14px;
     color: #ccff66;
-    text-decoration: none;
 }
 
-li a {
-    color: inherit;
-}
-
-li.complete {
+.task.complete {
     color: #7e7e7e;    
 }
 
-.tag {
+.task .tag {
     color: #7e7e7e;
+}
+
+
+/* Hide all projects and tasks initially. Overridden by page-specific styles */
+.project, li {
+    display:none;
+}
+
+
+/* Today Page */
+
+#today .project.today {
+    display: block;
+}
+
+#today li.today {
+    display: list-item;
 }

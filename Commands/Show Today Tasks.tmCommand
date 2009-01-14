@@ -10,11 +10,16 @@
 # just to remind you of some useful environment variables
 # see Help / Environment Variables for the full list
 
-import os, sys, re
+import os, sys, re, datetime
 
 file = os.environ[ 'TM_FILEPATH' ]
 project_re = re.compile( '^(\s*)(?P&lt;title&gt;.+):\s*$' )
 task_re = re.compile( '^\s*(?P&lt;symbol&gt;-|✓)(?P&lt;title&gt;.+?)(?P&lt;tags&gt;((@\S*)(\s*))*)$' )
+
+tag_re = re.compile( r'@\S+' )
+today_tag_re = re.compile( r'@today')
+due_tag_re = re.compile( r'@due\((?P&lt;year&gt;\d{4})-(?P&lt;month&gt;\d{2})-(?P&lt;day&gt;\d{2})\)')
+done_tag_re = re.compile( r'@done\((?P&lt;year&gt;\d{4})-(?P&lt;month&gt;\d{2})-(?P&lt;day&gt;\d{2})\)')
 
 projects = []
 
@@ -23,38 +28,58 @@ lines = sys.stdin.readlines()
 current_project = None
 line_num = 0
 for line in lines:
-	line_num += 1
-	m = project_re.match( line )
-	if m:
-		current_project = { 
-			'title': m.group( 'title' ),
-			'line': line_num,
-			'tasks': []
-		}
-		projects.append( current_project )
-		continue
+    line_num += 1
+    m = project_re.match( line )
+    if m:
+        current_project = { 
+            'title': m.group( 'title' ),
+            'line': line_num,
+            'tasks': []
+        }
+        projects.append( current_project )
+        continue
 
-	m = task_re.match( line )
-	if m and m.group('tags') and m.group('tags').find( '@today' ) != -1:
-		task_complete = m.group( 'symbol' ) == '✓'
-		current_project['tasks'].append( {
-			'title': m.group( 'title' ),
-			'line': line_num,
-			'complete': task_complete
-		} )
+    m = task_re.match( line )
+    if m:
+        task_complete = m.group( 'symbol' ) == '✓'
+        current_task = {
+            'title': m.group( 'title' ),
+            'line': line_num,
+            'complete': task_complete,
+            'tags': []
+        }
+        
+        tags = tag_re.findall( line )
+        for tag in tags:
+            current_task[ 'tags' ].append( tag )
+            
+            tag_match = today_tag_re.match( tag )
+            current_task[ 'today' ] = tag_match != None
+            
+            tag_match = due_tag_re.match( tag )
+            if tag_match:
+                current_task[ 'due' ] = datetime.date( int( tag_match.group( 'year' ) ), int( tag_match.group( 'month' ) ), int( tag_match.group( 'day' ) ) )
+                
+            tag_match = done_tag_re.match( tag )
+            if tag_match:
+                current_task[ 'done' ] = datetime.date( int( tag_match.group( 'year' ) ), int( tag_match.group( 'month' ) ), int( tag_match.group( 'day' ) ) )
+
+        current_project['tasks'].append( current_task )
 
 
 
 print '&lt;html&gt;&lt;head&gt;&lt;title&gt;Tasks: Today&lt;/title&gt;&lt;link rel="stylesheet" type="text/css" href="file://%s/css/tasks.css"/&gt;&lt;/head&gt;&lt;body&gt;' % os.environ[ 'TM_BUNDLE_SUPPORT' ]
 for project in projects:
-	if len( project[ 'tasks' ] ):
-		print ( '&lt;h2&gt;&lt;a href="txmt://open/?url=file://%s&amp;line=%s"&gt;%s&lt;/a&gt;&lt;/h2&gt;' % ( file, str( project[ 'line' ] ), project[ 'title' ] ) )
-		print ( '&lt;ul&gt;' )
-
-		for task in project[ 'tasks' ]:
-			task_class = 'complete' if task[ 'complete' ] else 'pending'
-			print( '&lt;li class="%s"&gt;&lt;a href="txmt://open/?url=file://%s&amp;line=%s"&gt;%s&lt;/a&gt;&lt;/li&gt;' % ( task_class, file, str( task[ 'line' ] ), task[ 'title' ] ) )
-		print ( '&lt;/ul&gt;' )
+    if len( project[ 'tasks' ] ):
+        print ( '&lt;h2&gt;&lt;a href="txmt://open/?url=file://%s&amp;line=%s"&gt;%s&lt;/a&gt;&lt;/h2&gt;' % ( file, str( project[ 'line' ] ), project[ 'title' ] ) )
+        print ( '&lt;ul&gt;' )
+        
+        for task in project[ 'tasks' ]:
+            task_class = 'complete' if task[ 'complete' ] else 'pending'
+            if 'today' in task and task[ 'today'] == True:
+                task_class = 'today %s' % task_class
+            print( '&lt;li class="%s"&gt;&lt;a href="txmt://open/?url=file://%s&amp;line=%s"&gt;%s&lt;/a&gt;&lt;/li&gt;' % ( task_class, file, str( task[ 'line' ] ), task[ 'title' ] ) )
+        print ( '&lt;/ul&gt;' )
 
 print '&lt;/body&gt;&lt;/html&gt;'</string>
 	<key>input</key>
