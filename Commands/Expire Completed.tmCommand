@@ -20,8 +20,6 @@ print STDIN.read.gsub(COMPLETED_ITEM, '')
 	<string>document</string>
 	<key>input</key>
 	<string>selection</string>
-	<key>keyEquivalent</key>
-	<string>@e</string>
 	<key>name</key>
 	<string>Expire Completed</string>
 	<key>output</key>
